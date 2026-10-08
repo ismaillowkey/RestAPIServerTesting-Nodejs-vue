@@ -2,7 +2,9 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Net;
 using System.Net.NetworkInformation;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace AppCommandCenter
@@ -69,6 +71,8 @@ namespace AppCommandCenter
         private Button _btnOpenBrowser;
         private Button _btnAddFirewall;
         private Button _btnClearLog;
+        private Button _btnCheckUpdate;
+        private LinkLabel _lblUpdateStatus;
         private Label _lblStatus;
         private Label _lblPortCheck;
         private Label _lblFirewallStatus;
@@ -77,6 +81,8 @@ namespace AppCommandCenter
         private CheckBox _chkAutoStart;
         private CheckBox _chkMinimizeToTray;
         private string _appVersion = "1.0.0";
+        private string _latestReleaseUrl = "https://github.com/ismaillowkey/RestAPIServerTesting-Nodejs-vue/releases";
+        private bool _hasUpdateAvailable = false;
 
         private readonly string _settingsFilePath;
 
@@ -94,6 +100,9 @@ namespace AppCommandCenter
             {
                 StartServer();
             }
+
+            // Periksa update di background saat startup
+            CheckForUpdates(true);
         }
 
         private void LoadAppVersion()
@@ -289,16 +298,30 @@ namespace AppCommandCenter
             {
                 Text = "Minimize ke Tray saat ditutup (X)",
                 AutoSize = true,
-                Location = new Point(190, 102),
+                Location = new Point(175, 102),
                 Checked = true
             };
             _chkMinimizeToTray.CheckedChanged += (s, e) => SaveSettings();
 
+            _btnCheckUpdate = new Button
+            {
+                Text = "🔄 Check for Update",
+                Location = new Point(365, 100),
+                Size = new Size(138, 26),
+                BackColor = Color.FromArgb(240, 240, 240),
+                ForeColor = Color.FromArgb(70, 70, 70),
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand,
+                Font = new Font("Segoe UI", 8.5f)
+            };
+            _btnCheckUpdate.FlatAppearance.BorderSize = 0;
+            _btnCheckUpdate.Click += (s, e) => CheckForUpdates(false);
+
             _btnClearLog = new Button
             {
                 Text = "🧹 Clear Log",
-                Location = new Point(510, 100),
-                Size = new Size(135, 26),
+                Location = new Point(515, 100),
+                Size = new Size(130, 26),
                 BackColor = Color.FromArgb(240, 240, 240),
                 ForeColor = Color.FromArgb(70, 70, 70),
                 FlatStyle = FlatStyle.Flat,
@@ -317,8 +340,57 @@ namespace AppCommandCenter
             pnlControls.Controls.Add(_lblFirewallStatus);
             pnlControls.Controls.Add(_chkAutoStart);
             pnlControls.Controls.Add(_chkMinimizeToTray);
+            pnlControls.Controls.Add(_btnCheckUpdate);
             pnlControls.Controls.Add(_btnClearLog);
             this.Controls.Add(pnlControls);
+
+            // --- Footer Status Bar (Pojok Kanan Bawah untuk Update) ---
+            var pnlFooter = new Panel
+            {
+                Dock = DockStyle.Bottom,
+                Height = 30,
+                BackColor = Color.FromArgb(241, 245, 249),
+                Padding = new Padding(15, 0, 15, 0)
+            };
+
+            var lblFooterApp = new Label
+            {
+                Text = string.Format("Rest API Server v{0} | NeDB Database", _appVersion),
+                ForeColor = Color.FromArgb(100, 116, 139),
+                Font = new Font("Segoe UI", 8.5f),
+                AutoSize = true,
+                Location = new Point(15, 7)
+            };
+
+            _lblUpdateStatus = new LinkLabel
+            {
+                Text = "No app update available",
+                Font = new Font("Segoe UI", 9f, FontStyle.Regular),
+                LinkColor = Color.FromArgb(100, 116, 139),
+                ActiveLinkColor = Color.FromArgb(37, 99, 235),
+                LinkBehavior = LinkBehavior.NeverUnderline,
+                AutoSize = true,
+                Cursor = Cursors.Default
+            };
+            _lblUpdateStatus.LinkClicked += (s, e) =>
+            {
+                if (_hasUpdateAvailable)
+                {
+                    OpenReleaseUrl();
+                }
+            };
+
+            pnlFooter.Resize += (s, e) =>
+            {
+                if (_lblUpdateStatus != null)
+                {
+                    _lblUpdateStatus.Location = new Point(pnlFooter.ClientSize.Width - _lblUpdateStatus.PreferredWidth - 15, 7);
+                }
+            };
+
+            pnlFooter.Controls.Add(lblFooterApp);
+            pnlFooter.Controls.Add(_lblUpdateStatus);
+            this.Controls.Add(pnlFooter);
 
             // --- Logs Box ---
             var pnlLogs = new Panel
@@ -707,6 +779,197 @@ namespace AppCommandCenter
                 }
             }
             catch { }
+        }
+
+        private void CheckForUpdates(bool isStartup)
+        {
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(new Action(() => CheckForUpdates(isStartup)));
+                return;
+            }
+
+            UpdateStatusLabel("🔍 Checking for updates...", Color.FromArgb(100, 116, 139), false);
+
+            System.Threading.ThreadPool.QueueUserWorkItem(_ =>
+            {
+                try
+                {
+                    ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
+                    string apiUrl = "https://api.github.com/repos/ismaillowkey/RestAPIServerTesting-Nodejs-vue/releases/latest";
+
+                    var request = (HttpWebRequest)WebRequest.Create(apiUrl);
+                    request.UserAgent = "RestApiServer-Updater";
+                    request.Timeout = 7000;
+
+                    string json = null;
+                    try
+                    {
+                        using (var response = (HttpWebResponse)request.GetResponse())
+                        using (var reader = new StreamReader(response.GetResponseStream()))
+                        {
+                            json = reader.ReadToEnd();
+                        }
+                    }
+                    catch (WebException wex)
+                    {
+                        HttpWebResponse httpRes = wex.Response as HttpWebResponse;
+                        if (httpRes != null && httpRes.StatusCode == HttpStatusCode.NotFound)
+                        {
+                            // 404 Not Found: Belum ada release di GitHub
+                            this.BeginInvoke(new Action(() =>
+                            {
+                                _hasUpdateAvailable = false;
+                                UpdateStatusLabel("No app update available", Color.FromArgb(100, 116, 139), false);
+                                if (!isStartup)
+                                {
+                                    MessageBox.Show(
+                                        "Versi aplikasi Anda (v" + _appVersion + ") adalah versi terbaru.\n(Belum ada rilis baru di GitHub)",
+                                        "Check for Update",
+                                        MessageBoxButtons.OK,
+                                        MessageBoxIcon.Information
+                                    );
+                                }
+                            }));
+                            return;
+                        }
+                        throw;
+                    }
+
+                    if (!string.IsNullOrEmpty(json))
+                    {
+                        var tagMatch = Regex.Match(json, @"""tag_name""\s*:\s*""([^""]+)""");
+                        var urlMatch = Regex.Match(json, @"""html_url""\s*:\s*""([^""]+)""");
+
+                        if (tagMatch.Success)
+                        {
+                            string latestTag = tagMatch.Groups[1].Value.Trim();
+                            if (urlMatch.Success)
+                            {
+                                _latestReleaseUrl = urlMatch.Groups[1].Value;
+                            }
+
+                            if (IsNewerVersion(_appVersion, latestTag))
+                            {
+                                this.BeginInvoke(new Action(() =>
+                                {
+                                    _hasUpdateAvailable = true;
+                                    UpdateStatusLabel("update available, click here", Color.FromArgb(37, 99, 235), true);
+                                    if (!isStartup)
+                                    {
+                                        var res = MessageBox.Show(
+                                            "Versi terbaru (" + latestTag + ") tersedia!\nApakah Anda ingin membuka link rilis sekarang?",
+                                            "Update Tersedia",
+                                            MessageBoxButtons.YesNo,
+                                            MessageBoxIcon.Question
+                                        );
+                                        if (res == DialogResult.Yes)
+                                        {
+                                            OpenReleaseUrl();
+                                        }
+                                    }
+                                }));
+                                return;
+                            }
+                        }
+                    }
+
+                    this.BeginInvoke(new Action(() =>
+                    {
+                        _hasUpdateAvailable = false;
+                        UpdateStatusLabel("No app update available", Color.FromArgb(100, 116, 139), false);
+                        if (!isStartup)
+                        {
+                            MessageBox.Show(
+                                "Versi aplikasi Anda (v" + _appVersion + ") adalah versi terbaru.",
+                                "Check for Update",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information
+                            );
+                        }
+                    }));
+                }
+                catch (Exception ex)
+                {
+                    this.BeginInvoke(new Action(() =>
+                    {
+                        _hasUpdateAvailable = false;
+                        UpdateStatusLabel("No app update available", Color.FromArgb(130, 140, 150), false);
+                        if (!isStartup)
+                        {
+                            MessageBox.Show(
+                                "Gagal memeriksa update (pastikan koneksi internet aktif):\n" + ex.Message,
+                                "Check for Update",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Warning
+                            );
+                        }
+                    }));
+                }
+            });
+        }
+
+        private void UpdateStatusLabel(string text, Color color, bool isClickable)
+        {
+            if (_lblUpdateStatus == null) return;
+            _lblUpdateStatus.Text = text;
+            _lblUpdateStatus.LinkColor = color;
+            _lblUpdateStatus.ActiveLinkColor = color;
+            _lblUpdateStatus.LinkBehavior = isClickable ? LinkBehavior.AlwaysUnderline : LinkBehavior.NeverUnderline;
+            _lblUpdateStatus.Cursor = isClickable ? Cursors.Hand : Cursors.Default;
+            if (_lblUpdateStatus.Parent != null)
+            {
+                _lblUpdateStatus.Location = new Point(_lblUpdateStatus.Parent.ClientSize.Width - _lblUpdateStatus.PreferredWidth - 15, 7);
+            }
+        }
+
+        private void OpenReleaseUrl()
+        {
+            try
+            {
+                string url = string.IsNullOrEmpty(_latestReleaseUrl)
+                    ? "https://github.com/ismaillowkey/RestAPIServerTesting-Nodejs-vue/releases"
+                    : _latestReleaseUrl;
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = url,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Gagal membuka halaman release: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private static bool IsNewerVersion(string currentVerStr, string remoteVerStr)
+        {
+            try
+            {
+                currentVerStr = (currentVerStr ?? "").Trim().TrimStart('v', 'V');
+                remoteVerStr = (remoteVerStr ?? "").Trim().TrimStart('v', 'V');
+
+                Version current, remote;
+                if (TryParseCleanVersion(currentVerStr, out current) && TryParseCleanVersion(remoteVerStr, out remote))
+                {
+                    return remote > current;
+                }
+            }
+            catch { }
+            return false;
+        }
+
+        private static bool TryParseCleanVersion(string input, out Version version)
+        {
+            version = null;
+            if (string.IsNullOrEmpty(input)) return false;
+            int dashIdx = input.IndexOf('-');
+            if (dashIdx > 0) input = input.Substring(0, dashIdx);
+
+            string[] parts = input.Split('.');
+            if (parts.Length == 1) input += ".0.0";
+            else if (parts.Length == 2) input += ".0";
+            return Version.TryParse(input, out version);
         }
 
         private void SaveSettings()

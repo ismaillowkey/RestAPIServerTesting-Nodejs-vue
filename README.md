@@ -6,6 +6,16 @@ Aplikasi ini **100% PORTABLE** — siap didistribusikan ke komputer Windows mana
 
 ---
 
+## 📥 Download Installer Terbaru
+
+Unduh paket installer setup versi terbaru pada halaman [GitHub Releases](https://github.com/ismaillowkey/RestAPIServerTesting-Nodejs-vue/releases):
+
+| Berkas | Platform | Tautan Unduhan |
+| :--- | :--- | :--- |
+| Rest API Server Setup | Windows 10 / 11 (32-bit / 64-bit) | [Download Setup (.exe / .zip)](https://github.com/ismaillowkey/RestAPIServerTesting-Nodejs-vue/releases) |
+
+---
+
 ## 📁 Struktur Direktori Proyek
 
 ```text
