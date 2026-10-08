@@ -1,0 +1,45 @@
+# Node.js & Dependencies
+node_modules/
+*/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Build Artifacts & Compiled Bundles
+dist/
+src/dist/
+publish/
+
+# Local Databases (NeDB runtime data)
+data/*.db
+src/data/*.db
+*.db
+
+# Runtime Settings & Logs
+settings.ini
+*.log
+
+# C# & Visual Studio temporary files
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store

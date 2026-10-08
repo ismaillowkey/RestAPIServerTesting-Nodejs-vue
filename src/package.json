@@ -1,0 +1,37 @@
+{
+  "name": "nodejs-vue-restapi-server",
+  "version": "1.0.0",
+  "description": "Unified Node.js, Vue 3, and SQLite REST API Server in a single port",
+  "main": "server/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node server/index.js",
+    "build": "node scripts/build.js",
+    "package:portable": "node scripts/package-portable.js",
+    "start": "cross-env NODE_ENV=production node dist/index.js",
+    "seed": "node server/seed.js"
+  },
+  "keywords": [
+    "nodejs",
+    "vue",
+    "sqlite",
+    "rest-api",
+    "express"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@seald-io/nedb": "^4.1.2",
+    "@vitejs/plugin-vue": "^6.0.9",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "lucide-vue-next": "^1.0.0",
+    "swagger-ui-express": "^5.0.1",
+    "vite": "^8.3.0",
+    "vue": "^3.5.42"
+  },
+  "devDependencies": {
+    "cross-env": "^10.1.0",
+    "esbuild": "^0.28.2"
+  }
+}
