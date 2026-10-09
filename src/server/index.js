@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'node:path';
+import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import swaggerUi from 'swagger-ui-express';
 import { config } from '../config.js';
@@ -80,14 +81,33 @@ async function startServer() {
     });
   }
 
-  const server = app.listen(config.port, () => {
+  const host = config.host || '0.0.0.0';
+  const server = app.listen(config.port, host, () => {
+    let lanIp = null;
+    try {
+      const ifaces = os.networkInterfaces();
+      for (const name of Object.keys(ifaces)) {
+        for (const iface of ifaces[name]) {
+          if (iface.family === 'IPv4' && !iface.internal) {
+            lanIp = iface.address;
+            break;
+          }
+        }
+        if (lanIp) break;
+      }
+    } catch { }
+
     console.log('====================================================');
-    console.log(`🚀 Web Server berjalan di: http://localhost:${config.port}`);
+    console.log(`🚀 Web Server berjalan di:`);
+    console.log(`   - Local : http://localhost:${config.port}`);
+    if (lanIp) {
+      console.log(`   - LAN   : http://${lanIp}:${config.port}`);
+    }
     console.log(`📦 REST API Product:        http://localhost:${config.port}/api/products`);
     console.log(`📅 REST API Plan Downtime:  http://localhost:${config.port}/api/plan-downtimes`);
     console.log(`⚠️  REST API Unplan Downtime:http://localhost:${config.port}/api/unplan-downtimes`);
     console.log(`📖 Swagger API Docs:        http://localhost:${config.port}/api/docs`);
-    console.log(`⚙️  Konfigurasi Port di:     config.js (PORT = ${config.port})`);
+    console.log(`⚙️  Host & Port:            ${host}:${config.port} (0.0.0.0 = Terbuka untuk LAN)`);
     console.log('====================================================');
   });
 

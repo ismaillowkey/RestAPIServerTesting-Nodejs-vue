@@ -11,8 +11,8 @@ export const config = {
   // Urutan prioritas: argumen CLI > environment variable > default 3500
   port: parsedCliPort || (process.env.PORT ? parseInt(process.env.PORT, 10) : 3500),
 
-  // Host aplikasi
-  host: process.env.HOST || 'localhost',
+  // Host aplikasi (0.0.0.0 agar bisa diakses dari LAN / IP luar)
+  host: process.env.HOST || '0.0.0.0',
 
   // Nama file database SQLite
   dbFile: 'data.sqlite',

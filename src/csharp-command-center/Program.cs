@@ -46,8 +46,8 @@ namespace AppCommandCenter
                 catch { }
 
                 MessageBox.Show(
-                    "Aplikasi Command Center sudah berjalan!\nHanya 1 instance yang diperbolehkan berjalan secara bersamaan.\nSilakan periksa di Taskbar atau System Tray.",
-                    "Informasi - Rest API Server",
+                    "Aplikasi Control Center RASNodevue sudah berjalan!\nHanya 1 instance yang diperbolehkan berjalan secara bersamaan.\nSilakan periksa di Taskbar atau System Tray.",
+                    "Informasi - Control Center RASNodevue",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information
                 );
@@ -128,9 +128,9 @@ namespace AppCommandCenter
 
         private void InitializeUI()
         {
-            this.Text = string.Format("Command Center v{0} - Node.js + Vue App", _appVersion);
-            this.Size = new Size(730, 580);
-            this.MinimumSize = new Size(640, 500);
+            this.Text = string.Format("Control Center RASNodevue v{0}", _appVersion);
+            this.Size = new Size(750, 610);
+            this.MinimumSize = new Size(640, 520);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Font = new Font("Segoe UI", 9.5f, FontStyle.Regular);
             this.BackColor = Color.FromArgb(245, 247, 250);
@@ -161,7 +161,7 @@ namespace AppCommandCenter
 
             var lblTitle = new Label
             {
-                Text = string.Format("⚡ Control Panel Server v{0}", _appVersion),
+                Text = string.Format("⚡ Control Center RASNodevue v{0}", _appVersion),
                 ForeColor = Color.White,
                 Font = new Font("Segoe UI", 12f, FontStyle.Bold),
                 AutoSize = true,
@@ -185,7 +185,7 @@ namespace AppCommandCenter
             var pnlControls = new Panel
             {
                 Dock = DockStyle.Top,
-                Height = 142,
+                Height = 156,
                 Padding = new Padding(15, 10, 15, 10),
                 BackColor = Color.White
             };
@@ -266,11 +266,21 @@ namespace AppCommandCenter
             _btnAddFirewall.FlatAppearance.BorderSize = 0;
             _btnAddFirewall.Click += (s, e) => AddPortToFirewall();
 
+            // Petunjuk tepat di bawah tulisan / tombol Start
+            var lblPopupHint = new Label
+            {
+                Text = "ℹ️ jika muncul popup, pilih allow access",
+                Location = new Point(200, 44),
+                AutoSize = true,
+                Font = new Font("Segoe UI", 8.25f, FontStyle.Regular),
+                ForeColor = Color.FromArgb(100, 116, 139)
+            };
+
             // Label Informasi Pemeriksaan Ketersediaan Port
             _lblPortCheck = new Label
             {
                 Text = "🔍 Memeriksa ketersediaan Port...",
-                Location = new Point(15, 48),
+                Location = new Point(15, 68),
                 AutoSize = true,
                 Font = new Font("Segoe UI", 9f, FontStyle.Regular),
                 ForeColor = Color.FromArgb(100, 116, 139)
@@ -280,7 +290,7 @@ namespace AppCommandCenter
             _lblFirewallStatus = new Label
             {
                 Text = "🔍 Memeriksa status Windows Firewall...",
-                Location = new Point(15, 72),
+                Location = new Point(15, 92),
                 AutoSize = true,
                 Font = new Font("Segoe UI", 9.5f, FontStyle.Bold),
                 ForeColor = Color.FromArgb(239, 68, 68)
@@ -290,7 +300,7 @@ namespace AppCommandCenter
             {
                 Text = "Auto-start saat dibuka",
                 AutoSize = true,
-                Location = new Point(18, 102)
+                Location = new Point(18, 120)
             };
             _chkAutoStart.CheckedChanged += (s, e) => SaveSettings();
 
@@ -298,7 +308,7 @@ namespace AppCommandCenter
             {
                 Text = "Minimize ke Tray saat ditutup (X)",
                 AutoSize = true,
-                Location = new Point(175, 102),
+                Location = new Point(175, 120),
                 Checked = true
             };
             _chkMinimizeToTray.CheckedChanged += (s, e) => SaveSettings();
@@ -306,8 +316,8 @@ namespace AppCommandCenter
             _btnCheckUpdate = new Button
             {
                 Text = "🔄 Check for Update",
-                Location = new Point(365, 100),
-                Size = new Size(138, 26),
+                Location = new Point(415, 117),
+                Size = new Size(142, 28),
                 BackColor = Color.FromArgb(240, 240, 240),
                 ForeColor = Color.FromArgb(70, 70, 70),
                 FlatStyle = FlatStyle.Flat,
@@ -320,8 +330,8 @@ namespace AppCommandCenter
             _btnClearLog = new Button
             {
                 Text = "🧹 Clear Log",
-                Location = new Point(515, 100),
-                Size = new Size(130, 26),
+                Location = new Point(570, 117),
+                Size = new Size(130, 28),
                 BackColor = Color.FromArgb(240, 240, 240),
                 ForeColor = Color.FromArgb(70, 70, 70),
                 FlatStyle = FlatStyle.Flat,
@@ -336,6 +346,7 @@ namespace AppCommandCenter
             pnlControls.Controls.Add(_btnStop);
             pnlControls.Controls.Add(_btnOpenBrowser);
             pnlControls.Controls.Add(_btnAddFirewall);
+            pnlControls.Controls.Add(lblPopupHint);
             pnlControls.Controls.Add(_lblPortCheck);
             pnlControls.Controls.Add(_lblFirewallStatus);
             pnlControls.Controls.Add(_chkAutoStart);
@@ -355,7 +366,7 @@ namespace AppCommandCenter
 
             var lblFooterApp = new Label
             {
-                Text = string.Format("Rest API Server v{0} | NeDB Database", _appVersion),
+                Text = string.Format("Control Center RASNodevue v{0} | NeDB Database", _appVersion),
                 ForeColor = Color.FromArgb(100, 116, 139),
                 Font = new Font("Segoe UI", 8.5f),
                 AutoSize = true,
@@ -427,12 +438,12 @@ namespace AppCommandCenter
             // --- System Tray Icon ---
             _trayIcon = new NotifyIcon
             {
-                Text = "Node.js + Vue Command Center",
+                Text = "Control Center RASNodevue",
                 Icon = this.Icon != null ? this.Icon : SystemIcons.Application,
                 Visible = true
             };
             var trayMenu = new ContextMenuStrip();
-            trayMenu.Items.Add("Buka Command Center", null, (s, e) => ShowFromTray());
+            trayMenu.Items.Add("Buka Control Center RASNodevue", null, (s, e) => ShowFromTray());
             trayMenu.Items.Add("Buka di Browser", null, (s, e) => OpenBrowser());
             trayMenu.Items.Add("-");
             trayMenu.Items.Add("Keluar Aplikasi", null, (s, e) => ExitApplication());
@@ -528,10 +539,23 @@ namespace AppCommandCenter
             {
                 AppendLog(string.Format("🛡️ Meminta izin Administrator untuk membuka Port {0} di Firewall...", port), Color.Cyan);
 
+                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                string nodeExe = Path.Combine(baseDir, @"engine\node.exe");
+
+                string cmdArgs;
+                if (File.Exists(nodeExe))
+                {
+                    cmdArgs = string.Format("/c netsh advfirewall firewall add rule name=\"NodeVue Port {0}\" dir=in action=allow protocol=TCP localport={0} profile=any & netsh advfirewall firewall add rule name=\"NodeVue Node Runtime\" dir=in action=allow program=\"{1}\" profile=any enable=yes", port, nodeExe);
+                }
+                else
+                {
+                    cmdArgs = string.Format("/c netsh advfirewall firewall add rule name=\"NodeVue Port {0}\" dir=in action=allow protocol=TCP localport={0} profile=any", port);
+                }
+
                 var psi = new ProcessStartInfo
                 {
-                    FileName = "netsh",
-                    Arguments = string.Format("advfirewall firewall add rule name=\"NodeVue Port {0}\" dir=in action=allow protocol=TCP localport={0}", port),
+                    FileName = "cmd.exe",
+                    Arguments = cmdArgs,
                     Verb = "runas", // UAC Prompt Administrator
                     UseShellExecute = true,
                     WindowStyle = ProcessWindowStyle.Hidden
@@ -542,9 +566,9 @@ namespace AppCommandCenter
                     p.WaitForExit();
                     if (p.ExitCode == 0)
                     {
-                        AppendLog(string.Format("✅ Berhasil menambahkan Port {0} ke Windows Firewall!", port), Color.LimeGreen);
+                        AppendLog(string.Format("✅ Berhasil menambahkan Port {0} & Node Runtime ke Windows Firewall!", port), Color.LimeGreen);
                         MessageBox.Show(
-                            string.Format("Port {0} berhasil dibuka di Windows Firewall!\nKomputer lain di jaringan LAN kini dapat mengakses aplikasi ini.", port),
+                            string.Format("Port {0} & Node Runtime berhasil dibuka di Windows Firewall (Semua Profil: Private & Public)!\nKomputer/HP lain di jaringan LAN/WiFi kini dapat mengakses aplikasi ini.", port),
                             "Firewall Berhasil Dikonfigurasi",
                             MessageBoxButtons.OK,
                             MessageBoxIcon.Information
@@ -608,6 +632,8 @@ namespace AppCommandCenter
                 _nodeProcess.StartInfo.EnvironmentVariables["NODE_ENV"] = "production";
                 _nodeProcess.StartInfo.UseShellExecute = false;
                 _nodeProcess.StartInfo.CreateNoWindow = true;
+                _nodeProcess.StartInfo.StandardOutputEncoding = System.Text.Encoding.UTF8;
+                _nodeProcess.StartInfo.StandardErrorEncoding = System.Text.Encoding.UTF8;
                 _nodeProcess.StartInfo.RedirectStandardOutput = true;
                 _nodeProcess.StartInfo.RedirectStandardError = true;
 
@@ -738,7 +764,7 @@ namespace AppCommandCenter
             {
                 e.Cancel = true;
                 this.Hide();
-                _trayIcon.ShowBalloonTip(1500, "Command Center", "Server tetap berjalan di background System Tray.", ToolTipIcon.Info);
+                _trayIcon.ShowBalloonTip(1500, "Control Center RASNodevue", "Server tetap berjalan di background System Tray.", ToolTipIcon.Info);
                 return;
             }
 

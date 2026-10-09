@@ -7,7 +7,7 @@
   !define VERSION "1.0.0"
 !endif
 
-!define APP_NAME "Rest API server"
+!define APP_NAME "Control Center RASNodevue"
 !define PUBLISHER "Ismail Lowkey"
 !define EXE_NAME "CommandCenter.exe"
 
@@ -87,11 +87,11 @@ Section "MainSection" SecMain
 
     ; Shortcut Start Menu: Rest API server -> nodejs vue testing
     CreateDirectory "$SMPROGRAMS\Rest API server\nodejs vue testing"
-    CreateShortcut "$SMPROGRAMS\Rest API server\nodejs vue testing\Command Center.lnk" "$INSTDIR\${EXE_NAME}" "" "$INSTDIR\app.ico" 0
+    CreateShortcut "$SMPROGRAMS\Rest API server\nodejs vue testing\Control Center RASNodevue.lnk" "$INSTDIR\${EXE_NAME}" "" "$INSTDIR\app.ico" 0
     CreateShortcut "$SMPROGRAMS\Rest API server\nodejs vue testing\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\app.ico" 0
 
     ; Shortcut Desktop
-    CreateShortcut "$DESKTOP\Command Center.lnk" "$INSTDIR\${EXE_NAME}" "" "$INSTDIR\app.ico" 0
+    CreateShortcut "$DESKTOP\Control Center RASNodevue.lnk" "$INSTDIR\${EXE_NAME}" "" "$INSTDIR\app.ico" 0
 SectionEnd
 
 ; ----------------------------------------------------
@@ -100,12 +100,14 @@ SectionEnd
 ; ----------------------------------------------------
 Section "Uninstall"
     ; Hapus shortcuts Start Menu
+    Delete "$SMPROGRAMS\Rest API server\nodejs vue testing\Control Center RASNodevue.lnk"
     Delete "$SMPROGRAMS\Rest API server\nodejs vue testing\Command Center.lnk"
     Delete "$SMPROGRAMS\Rest API server\nodejs vue testing\Uninstall.lnk"
     RMDir "$SMPROGRAMS\Rest API server\nodejs vue testing"
     RMDir "$SMPROGRAMS\Rest API server"
 
     ; Hapus shortcut Desktop
+    Delete "$DESKTOP\Control Center RASNodevue.lnk"
     Delete "$DESKTOP\Command Center.lnk"
 
     ; Hapus file aplikasi

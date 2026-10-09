@@ -1,6 +1,6 @@
 # ⚡ Unified Node.js, Vue 3 & NeDB NoSQL Server (Windows Portable)
 
-Aplikasi fullstack terpadu yang menggabungkan **Frontend Vue 3**, **Backend Express REST API**, dan **NeDB NoSQL Database (mirip LiteDB / MongoDB)** dalam satu port, dilengkapi dengan **Command Center Desktop (C# .NET Framework 4.7.2)** sebagai panel kontrol lokal.
+Aplikasi fullstack terpadu yang menggabungkan **Frontend Vue 3**, **Backend Express REST API**, dan **NeDB NoSQL Database (mirip LiteDB / MongoDB)** dalam satu port, dilengkapi dengan **Control Center RASNodevue (C# .NET Framework 4.7.2)** sebagai panel kontrol lokal.
 
 Aplikasi ini **100% PORTABLE** — siap didistribusikan ke komputer Windows mana pun **tanpa perlu menginstall Node.js sama sekali**.
 
@@ -20,6 +20,9 @@ Unduh paket installer setup versi terbaru pada halaman [GitHub Releases](https:/
 
 ```text
 Nodejs-vue-RestAPIServer/
+│
+├── 📸 screenshot/             <-- Folder tangkapan layar antarmuka
+│   └── 🖼️ command-center.png  <-- Preview GUI Command Center
 │
 ├── 🚀 create_portableapps.bat <-- Script 1-klik membuat aplikasi Portable
 ├── 📦 create_installer.bat    <-- Script 1-klik membuat Setup Installer (.exe)
@@ -46,6 +49,7 @@ Nodejs-vue-RestAPIServer/
 │   └── package.json           <-- Dependensi project
 │
 ├── ⚙️ .gitignore              <-- Konfigurasi file git yang diabaikan
+├── 📖 GEMINI.md               <-- Panduan arsitektur & aturan AI agent
 └── 📖 README.md               <-- Dokumentasi proyek ini
 ```
 
@@ -84,7 +88,9 @@ Sebelum menjalankan script pembuat aplikasi (`create_*.bat`), pastikan tool-tool
 
 ---
 
-## 🎮 Fitur Command Center (`CommandCenter.exe`)
+## 🎮 Fitur Control Center RASNodevue (`CommandCenter.exe`)
+
+![Control Center RASNodevue](screenshot/command-center.png)
 
 Aplikasi C# Windows Forms (.NET Framework 4.7.2) yang berfungsi sebagai pusat kendali:
 

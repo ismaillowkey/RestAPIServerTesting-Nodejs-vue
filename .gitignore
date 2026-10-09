@@ -43,3 +43,6 @@ Thumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 .DS_Store
+
+# AI Agent Instructions
+GEMINI.md
